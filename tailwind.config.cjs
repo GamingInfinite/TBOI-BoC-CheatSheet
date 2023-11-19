@@ -4,4 +4,11 @@ module.exports = {
   daisyui: {
     themes: ["dark"],
   },
+  theme: {
+    extend: {
+      scale: {
+        '200': "2.00"
+      }
+    }
+  }
 };

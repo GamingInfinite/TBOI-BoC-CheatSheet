@@ -9,6 +9,14 @@
   let seed: string;
   let convseed: number;
 
+  let craftableItemsGivenPickups: { id: number; bag: number[] }[] = [];
+
+  let testpickups = new Map<number, number>();
+    for (let i = 0; i < Object.keys(Pickups).length; i++) {
+        const element = Object.keys(Pickups)[i];
+        testpickups.set(Pickups[element].id, 8)
+    }
+
   function str2seed(iseed?: string) {
     if (iseed) {
       seed = iseed;
@@ -147,8 +155,6 @@
       item_count[pickup]++;
       item_score_sum += score_matrix[pickup];
     }
-    console.log(item_count);
-    console.log(item_score_sum);
 
     let weights = [
       { id: 0, weight: 1.0 },
@@ -239,7 +245,52 @@
     return selected;
   }
 
-  onMount(() => {
+  async function PickupCombinations(pickups: Map<number, number>) {
+    let items = [];
+    let itemtypes = 0;
+    for (let [key, value] of pickups) {
+        if (value != 0) {
+            itemtypes++
+        }
+      for (let i = 0; i < value; i++) {
+        items.push(key);
+      }
+    }
+
+    let combinations = new Map<number, number[]>();
+    let combo = itemtypes * (items.length - 8);
+    if (combo == 0) {
+      combo++;
+    }
+    while (combinations.size != combo) {
+      let itemsTemp = [...items];
+      let newBag = [];
+      for (let i = 0; i < 8; i++) {
+        let randPick = Math.floor(Math.random() * itemsTemp.length);
+        newBag.push(itemsTemp[randPick]);
+        itemsTemp.splice(randPick, 1);
+      }
+      if (!combinations.has(bagSum(newBag))) {
+        combinations.set(bagSum(newBag), newBag);
+      }
+    }
+    console.log(combinations);
+
+    craftableItemsGivenPickups = [];
+    for (let bag of combinations.values()) {
+      craftableItemsGivenPickups.push({ id: getItem(bag), bag: bag });
+    }
+  }
+
+  function bagSum(bag: number[]) {
+    let sum = 0;
+    for (let i = 0; i < bag.length; i++) {
+      sum += bag[i];
+    }
+    return sum;
+  }
+
+  onMount(async () => {
     convseed = str2seed("JKD9 Z0C9");
   });
 </script>
@@ -249,7 +300,7 @@
 </svelte:head>
 
 <div class="flex flex-row justify-center">
-  <div class="flex flex-col">
+  <div class="flex flex-col gap-8">
     <div class="flex flex-row gap-4 m-8 justify-center">
       <input
         type="text"
@@ -261,43 +312,27 @@
         class="btn btn-accent"
         on:click={() => {
           convseed = str2seed();
-          console.log(
-            Items[
-              getItem([
-                Pickups.HEART,
-                Pickups.HEART,
-                Pickups.HEART,
-                Pickups.HEART,
-                Pickups.SOULHEART,
-                Pickups.SOULHEART,
-                Pickups.ETERNALHEART,
-                Pickups.ETERNALHEART,
-              ])
-            ]
-          );
         }}>Submit Seed</button
       >
     </div>
-    <div class="flex flex-row gap-4">
+    <div class="flex flex-row gap-4 justify-center">
       <div class="grid grid-cols-10 place-items-center gap-4">
-        {#each Object.values(Pickups) as item}
-          {#if typeof item == "number" && item != 14}
-            <div class="flex flex-row gap-2">
-              <div class="tooltip" data-tip={Pickups[item]}>
-                <img
-                  class="pixelated"
-                  class:scale-200={!(item == 17)}
-                  src="/src/lib/images/pickups/{item}.png"
-                  alt={String(item)}
-                />
-              </div>
-            </div>
-          {:else if item == 14}
-            <div class="tooltip" data-tip={Pickups[item]}>
+        {#each Object.entries(Pickups) as [_, { name, id }]}
+          {#if id == 14}
+            <div class="tooltip" data-tip={name}>
               <img
                 class="pixelated scale-200"
-                src="/src/lib/images/pickups/14.gif"
-                alt="14"
+                src="/src/lib/images/pickups/{id}.gif"
+                alt={name}
+              />
+            </div>
+          {:else}
+            <div class="tooltip" data-tip={name}>
+              <img
+                class="pixelated"
+                class:scale-200={!(id == 17)}
+                src="/src/lib/images/pickups/{id}.png"
+                alt={name}
               />
             </div>
           {/if}
@@ -310,6 +345,44 @@
           </div>
         </div>
       {/if}
+    </div>
+    <div class="flex flex-row justify-center mx-8">
+      <div class="grid grid-cols-10 gap-8">
+        {#each craftableItemsGivenPickups as item}
+          <div class="flex flex-col gap-8">
+            <div class="flex flex-row justify-center">
+              <div class="tooltip" data-tip={Items[item.id].name}>
+                <img
+                  class="scale-200 pixelated"
+                  src="/src/lib/images/collectibles/Collectible_{encodeURI(Items[
+                    item.id
+                  ].name.replace(' ', '_'))}_icon.png"
+                  alt={Items[item.id].name.replace(" ", "_")}
+                />
+              </div>
+            </div>
+            <div class="flex flex-row justify-center">
+              <div class="grid grid-cols-4 place-items-center gap-4">
+                {#each item.bag as pickup}
+                  {#if pickup == 14}
+                    <img
+                      class="scale-150 pixelated"
+                      src="/src/lib/images/pickups/{pickup}.gif"
+                      alt={Pickups[pickup]}
+                    />
+                  {:else}
+                    <img
+                      class="scale-150 pixelated"
+                      src="/src/lib/images/pickups/{pickup}.png"
+                      alt={Pickups[pickup]}
+                    />
+                  {/if}
+                {/each}
+              </div>
+            </div>
+          </div>
+        {/each}
+      </div>
     </div>
   </div>
 </div>

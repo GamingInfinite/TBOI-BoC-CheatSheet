@@ -1,33 +1,152 @@
-export enum Pickups {
-  HEART = 1,
-  SOULHEART,
-  BLACKHEART,
-  ETERNALHEART,
-  GOLDHEART,
-  BONEHEART,
-  ROTTENHEART,
-  PENNY,
-  NICKEL,
-  DIME,
-  LUCKYPENNY,
-  KEY,
-  GOLDKEY,
-  CHARGEDKEY,
-  BOMB,
-  GOLDBOMB,
-  MEGABOMB,
-  MICROBATTERY,
-  BATTERY,
-  MEGABATTERY,
-  CARD,
-  PILL,
-  RUNE,
-  DICESHARD,
-  CRACKEDKEY,
-  GOLDPENNY,
-  GOLDPILL,
-  GOLDBATTERY,
-  POOPNUGGET,
+// export enum Pickups {
+//   HEART = 1,
+//   SOULHEART,
+//   BLACKHEART,
+//   ETERNALHEART,
+//   GOLDHEART,
+//   BONEHEART,
+//   ROTTENHEART,
+//   PENNY,
+//   NICKEL,
+//   DIME,
+//   LUCKYPENNY,
+//   KEY,
+//   GOLDKEY,
+//   CHARGEDKEY,
+//   BOMB,
+//   GOLDBOMB,
+//   MEGABOMB,
+//   MICROBATTERY,
+//   BATTERY,
+//   MEGABATTERY,
+//   CARD,
+//   PILL,
+//   RUNE,
+//   DICESHARD,
+//   CRACKEDKEY,
+//   GOLDPENNY,
+//   GOLDPILL,
+//   GOLDBATTERY,
+//   POOPNUGGET,
+// }
+
+export const Pickups = {
+    HEART: {
+        name: "Heart",
+        id: 1
+    },
+    SOULHEART: {
+        name: "Soul Heart",
+        id: 2
+    },
+    BLACKHEART: {
+        name: "Black Heart",
+        id: 3
+    },
+    ETERNALHEART: {
+        name: "Eternal Heart",
+        id: 4
+    },
+    GOLDHEART: {
+        name: "Gold Heart",
+        id: 5
+    },
+    BONEHEART: {
+        name: "Bone Heart",
+        id: 6
+    },
+    ROTTENHEART: {
+        name: "Rotten Heart",
+        id: 7
+    },
+    PENNY: {
+        name: "Penny",
+        id: 8
+    },
+    NICKEL: {
+        name: "Nickel",
+        id: 9
+    },
+    DIME: {
+        name: "Dime",
+        id: 10
+    },
+    LUCKYPENNY: {
+        name: "Lucky Penny",
+        id: 11
+    },
+    KEY: {
+        name: "Key",
+        id: 12
+    },
+    GOLDKEY: {
+        name: "Gold Key",
+        id: 13
+    },
+    CHARGEDKEY: {
+        name: "Charged Key",
+        id: 14
+    },
+    BOMB: {
+        name: "Bomb",
+        id: 15
+    },
+    GOLDBOMB: {
+        name: "Gold Bomb",
+        id: 16
+    },
+    MEGABOMB: {
+        name: "Giga Bomb",
+        id: 17
+    },
+    MICROBATTERY: {
+        name: "Micro Battery",
+        id: 18
+    },
+    BATTERY: {
+        name: "Lil\' Battery",
+        id: 19
+    },
+    MEGABATTERY: {
+        name: "Mega Battery",
+        id: 20
+    },
+    CARD: {
+        name: "Card",
+        id: 21
+    },
+    PILL: {
+        name: "Pill",
+        id: 22
+    },
+    RUNE: {
+        name: "Rune",
+        id: 23
+    },
+    DICESHARD: {
+        name: "Dice Shard",
+        id: 24
+    },
+    CRACKEDKEY: {
+        name: "Cracked Key",
+        id: 25
+    },
+    GOLDPENNY: {
+        name: "Golden Penny",
+        id: 26
+    },
+    GOLDPILL: {
+        name: "Gold Pill",
+        id: 27
+    },
+    GOLDBATTERY: {
+        name: "Gold Battery",
+        id: 28
+    },
+    POOPNUGGET: {
+        name: "Poop Nugget",
+        id: 29
+    }
 }
 
 export const ItemPools = {

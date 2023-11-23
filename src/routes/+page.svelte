@@ -1,4 +1,5 @@
 <script lang="ts">
+  import * as combinations from "combinations";
   import { ItemPools, Items, Pickups } from "$lib/data";
   import { onMount } from "svelte";
 
@@ -9,13 +10,18 @@
   let seed: string;
   let convseed: number;
 
-  let craftableItemsGivenPickups: { id: number; bag: number[] }[] = [];
+  let proceduralWorker: Worker;
+  let randPickupWorker: Worker;
+
+  let craftableItemsGivenPickups: Map<number, { id: number; bag: number[] }> =
+    new Map<number, { id: number; bag: number[] }>();
+  let showCrafts = true;
 
   let testpickups = new Map<number, number>();
-    for (let i = 0; i < Object.keys(Pickups).length; i++) {
-        const element = Object.keys(Pickups)[i];
-        testpickups.set(Pickups[element].id, 8)
-    }
+  for (let i = 0; i < Object.keys(Pickups).length; i++) {
+    const element = Object.keys(Pickups)[i];
+    testpickups.set(Pickups[element].id, 1);
+  }
 
   function str2seed(iseed?: string) {
     if (iseed) {
@@ -245,53 +251,84 @@
     return selected;
   }
 
-  async function PickupCombinations(pickups: Map<number, number>) {
-    let items = [];
-    let itemtypes = 0;
-    for (let [key, value] of pickups) {
-        if (value != 0) {
-            itemtypes++
-        }
-      for (let i = 0; i < value; i++) {
-        items.push(key);
-      }
-    }
+  function sortBag(a, b) {
+    return a - b;
+  }
 
-    let combinations = new Map<number, number[]>();
-    let combo = itemtypes * (items.length - 8);
-    if (combo == 0) {
-      combo++;
-    }
-    while (combinations.size != combo) {
-      let itemsTemp = [...items];
-      let newBag = [];
-      for (let i = 0; i < 8; i++) {
-        let randPick = Math.floor(Math.random() * itemsTemp.length);
-        newBag.push(itemsTemp[randPick]);
-        itemsTemp.splice(randPick, 1);
-      }
-      if (!combinations.has(bagSum(newBag))) {
-        combinations.set(bagSum(newBag), newBag);
-      }
-    }
-    console.log(combinations);
-
-    craftableItemsGivenPickups = [];
-    for (let bag of combinations.values()) {
-      craftableItemsGivenPickups.push({ id: getItem(bag), bag: bag });
-    }
+  function sortCollection(a, b) {
+    //Do Later, sort by qualities then ids
   }
 
   function bagSum(bag: number[]) {
-    let sum = 0;
+    let sum = 1;
     for (let i = 0; i < bag.length; i++) {
-      sum += bag[i];
+      sum *= bag[i];
     }
     return sum;
   }
 
+  const preload = async (src) => {
+    const response = await fetch(src);
+    const obj = await response.json();
+    return obj;
+  };
+
   onMount(async () => {
     convseed = str2seed("JKD9 Z0C9");
+
+    proceduralWorker = new Worker(
+      new URL("../lib/workers/proceduralWorker.ts", import.meta.url)
+    );
+    randPickupWorker = new Worker(
+      new URL("../lib/workers/moduleWorker.ts", import.meta.url),
+      { type: "module" }
+    );
+
+    proceduralWorker.onmessage = (e) => {
+      let sortedBag = e.data.sort(sortBag);
+      let bagObject = { id: getItem(sortedBag), bag: sortedBag };
+      if (!craftableItemsGivenPickups.has(bagSum(sortedBag))) {
+        craftableItemsGivenPickups.set(bagSum(sortedBag), bagObject);
+      }
+      craftableItemsGivenPickups = craftableItemsGivenPickups;
+    };
+
+    randPickupWorker.onmessage = (e) => {
+      //   if (!(e.data == "Done")) {
+      //     let sortedBag = e.data.sort(sortBag);
+      //     let bagObject = { id: getItem(sortedBag), bag: sortedBag };
+      //     if (!craftableItemsGivenPickups.has(bagSum(sortedBag))) {
+      //       craftableItemsGivenPickups.set(bagSum(sortedBag), bagObject);
+      //     }
+      //     craftableItemsGivenPickups = craftableItemsGivenPickups;
+      //   } else {
+      //     showCrafts = true;
+      //   }
+      console.log(e.data);
+    };
+
+    let items = [];
+    let itemtypes = 0;
+    for (let [key, value] of testpickups) {
+      if (value != 0) {
+        itemtypes++;
+      }
+      for (let i = 0; i < value; i++) {
+        items.push(key);
+      }
+    }
+    console.log(items)
+    
+    randPickupWorker.postMessage(items);
+    // console.log(combinations(items, 8, 8));
+
+    for (let i = 0; i < 29; i++) {
+      for (let j = 0; j < 29; j++) {
+        setTimeout(() => {
+          //   proceduralWorker.postMessage([i + 1, j + 1]);
+        }, 1000 * (i + j));
+      }
+    }
   });
 </script>
 
@@ -316,10 +353,10 @@
       >
     </div>
     <div class="flex flex-row gap-4 justify-center">
-      <div class="grid grid-cols-10 place-items-center gap-4">
+      <div class="grid grid-cols-10 place-items-center">
         {#each Object.entries(Pickups) as [_, { name, id }]}
           {#if id == 14}
-            <div class="tooltip" data-tip={name}>
+            <div class="tooltip m-4" data-tip={name}>
               <img
                 class="pixelated scale-200"
                 src="/src/lib/images/pickups/{id}.gif"
@@ -327,7 +364,7 @@
               />
             </div>
           {:else}
-            <div class="tooltip" data-tip={name}>
+            <div class="tooltip m-4" data-tip={name}>
               <img
                 class="pixelated"
                 class:scale-200={!(id == 17)}
@@ -348,40 +385,55 @@
     </div>
     <div class="flex flex-row justify-center mx-8">
       <div class="grid grid-cols-10 gap-8">
-        {#each craftableItemsGivenPickups as item}
-          <div class="flex flex-col gap-8">
-            <div class="flex flex-row justify-center">
-              <div class="tooltip" data-tip={Items[item.id].name}>
-                <img
-                  class="scale-200 pixelated"
-                  src="/src/lib/images/collectibles/Collectible_{encodeURI(Items[
-                    item.id
-                  ].name.replace(' ', '_'))}_icon.png"
-                  alt={Items[item.id].name.replace(" ", "_")}
-                />
+        {#if showCrafts}
+          {#each [...craftableItemsGivenPickups.values()] as item}
+            <div class="flex flex-col gap-8">
+              <div class="flex flex-row justify-center">
+                <div class="tooltip" data-tip={Items[item.id].name}>
+                  {#await preload("/src/lib/images/collectibles/Collectible_" + encodeURI(Items[item.id].name
+                          .replaceAll(" ", "_")
+                          .replaceAll("/", "_")) + "_icon.png")}
+                    <div class="skeleton w-32 h-32" />
+                  {:then base64}
+                    <img
+                      class="scale-200 pixelated"
+                      src={base64}
+                      alt={Items[item.id].name.replaceAll(" ", "_")}
+                    />
+                  {/await}
+                  <img
+                    class="scale-200 pixelated"
+                    src="/src/lib/images/collectibles/Collectible_{encodeURI(
+                      Items[item.id].name
+                        .replaceAll(' ', '_')
+                        .replaceAll('/', '_')
+                    )}_icon.png"
+                    alt={Items[item.id].name.replaceAll(" ", "_")}
+                  />
+                </div>
+              </div>
+              <div class="flex flex-row justify-center">
+                <div class="grid grid-cols-4 place-items-center gap-4">
+                  {#each item.bag as pickup}
+                    {#if pickup == 14}
+                      <img
+                        class="scale-150 pixelated"
+                        src="/src/lib/images/pickups/{pickup}.gif"
+                        alt={Pickups[pickup]}
+                      />
+                    {:else}
+                      <img
+                        class="scale-150 pixelated"
+                        src="/src/lib/images/pickups/{pickup}.png"
+                        alt={Pickups[pickup]}
+                      />
+                    {/if}
+                  {/each}
+                </div>
               </div>
             </div>
-            <div class="flex flex-row justify-center">
-              <div class="grid grid-cols-4 place-items-center gap-4">
-                {#each item.bag as pickup}
-                  {#if pickup == 14}
-                    <img
-                      class="scale-150 pixelated"
-                      src="/src/lib/images/pickups/{pickup}.gif"
-                      alt={Pickups[pickup]}
-                    />
-                  {:else}
-                    <img
-                      class="scale-150 pixelated"
-                      src="/src/lib/images/pickups/{pickup}.png"
-                      alt={Pickups[pickup]}
-                    />
-                  {/if}
-                {/each}
-              </div>
-            </div>
-          </div>
-        {/each}
+          {/each}
+        {/if}
       </div>
     </div>
   </div>

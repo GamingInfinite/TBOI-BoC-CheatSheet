@@ -1,11 +1,7 @@
-let combinations = new Map<number, number[]>();
+let combinations = new Map<string, number[]>();
 
-self.onmessage = (e: MessageEvent) => {
+self.onmessage = async (e: MessageEvent) => {
   const pickups = e.data;
-  chunk(pickups, 1000);
-};
-
-function chunk(pickups, entries) {
   let items = [];
   let itemtypes = 0;
   for (let [key, value] of pickups) {
@@ -17,45 +13,49 @@ function chunk(pickups, entries) {
     }
   }
 
-  let count = 0;
-  let combo = itemtypes * (items.length - 8);
+  let combo =
+    factorial(itemtypes + 8 - 1) /
+    (factorial(8) * factorial(itemtypes + 8 - 1 - 8));
+    
   if (combo == 0) {
     combo++;
   }
   let retries = 0;
-  wholeEnchilada: {
-    while (count != entries) {
-      let itemsTemp = [...items];
-      let newBag = [];
-      for (let i = 0; i < 8; i++) {
-        let randPick = Math.floor(Math.random() * itemsTemp.length);
-        newBag.push(itemsTemp[randPick]);
-        itemsTemp.splice(randPick, 1);
-      }
-      if (!combinations.has(bagSum(newBag))) {
-        combinations.set(bagSum(newBag), newBag);
-        self.postMessage(newBag);
-        count++;
-      } else {
-        retries++;
-      }
-
-      console.log(count, retries);
-      if (retries >= 1000) {
-        self.postMessage("Done")
-        break wholeEnchilada;
-      }
+  while (combinations.size < combo) {
+    let itemsTemp = [...items];
+    let newBag = [];
+    for (let i = 0; i < 8; i++) {
+      let randPick = Math.floor(Math.random() * itemsTemp.length);
+      newBag.push(itemsTemp[randPick]);
+      itemsTemp.splice(randPick, 1);
     }
-    setTimeout(() => {
-      chunk(pickups, entries);
-    }, 1000);
+    newBag.sort(sortBag);
+    if (!combinations.has(await bagHash(newBag))) {
+      combinations.set(await bagHash(newBag), newBag);
+      self.postMessage(newBag);
+    } else {
+      retries++;
+    }
   }
+  console.log(combinations.size, retries);
+  console.log([...combinations.values()]);
+};
+
+function factorial(num: number) {
+  if (num == 1) {
+    return num;
+  }
+  return num * factorial(num - 1);
 }
 
-function bagSum(bag: number[]) {
-  let sum = 1;
-  for (let i = 0; i < bag.length; i++) {
-    sum *= bag[i];
-  }
-  return sum;
+async function bagHash(bag: number[]) {
+  const bagEncode = new TextEncoder().encode(bag.join(""));
+  const buffer = await crypto.subtle.digest("SHA-256", bagEncode);
+  const hashArray = Array.from(new Uint8Array(buffer));
+  const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  return hash;
+}
+
+function sortBag(a, b) {
+  return a - b;
 }

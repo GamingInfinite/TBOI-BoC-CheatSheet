@@ -9,7 +9,6 @@
     "@sveltejs/adapter-netlify": "2.0.7",
     "@sveltejs/kit": "1.20.1",
     "autoprefixer": "^10.4.14",
-    "combinations": "^1.0.0",
     "daisyui": "^3.0.1",
     "postcss": "^8.4.24",
     "postcss-load-config": "^4.0.1",

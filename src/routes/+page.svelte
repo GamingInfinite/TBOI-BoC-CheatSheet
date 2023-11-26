@@ -1,5 +1,4 @@
 <script lang="ts">
-  import * as combinations from "combinations";
   import { ItemPools, Items, Pickups } from "$lib/data";
   import { onMount } from "svelte";
 
@@ -10,18 +9,15 @@
   let seed: string;
   let convseed: number;
 
-  let proceduralWorker: Worker;
   let randPickupWorker: Worker;
 
-  let craftableItemsGivenPickups: Map<number, { id: number; bag: number[] }> =
-    new Map<number, { id: number; bag: number[] }>();
+  let craftableItemsGivenPickups = new Map<string, { id: number; bag: number[] }>();
   let showCrafts = true;
 
   let testpickups = new Map<number, number>();
-  for (let i = 0; i < Object.keys(Pickups).length; i++) {
-    const element = Object.keys(Pickups)[i];
-    testpickups.set(Pickups[element].id, 1);
-  }
+  testpickups.set(Pickups.HEART.id, 8);
+  testpickups.set(Pickups.KEY.id, 8);
+  testpickups.set(Pickups.BOMB.id, 8);
 
   function str2seed(iseed?: string) {
     if (iseed) {
@@ -259,76 +255,32 @@
     //Do Later, sort by qualities then ids
   }
 
-  function bagSum(bag: number[]) {
-    let sum = 1;
-    for (let i = 0; i < bag.length; i++) {
-      sum *= bag[i];
-    }
-    return sum;
+  async function bagHash(bag: number[]) {
+    const bagEncode = new TextEncoder().encode(bag.join(""));
+    const buffer = await window.crypto.subtle.digest("SHA-256", bagEncode);
+    const hashArray = Array.from(new Uint8Array(buffer));
+    const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    return hash;
   }
-
-  const preload = async (src) => {
-    const response = await fetch(src);
-    const obj = await response.json();
-    return obj;
-  };
 
   onMount(async () => {
     convseed = str2seed("JKD9 Z0C9");
-
-    proceduralWorker = new Worker(
-      new URL("../lib/workers/proceduralWorker.ts", import.meta.url)
-    );
     randPickupWorker = new Worker(
-      new URL("../lib/workers/moduleWorker.ts", import.meta.url),
+      new URL("../lib/workers/randPickupWorker.ts", import.meta.url),
       { type: "module" }
     );
 
-    proceduralWorker.onmessage = (e) => {
+    randPickupWorker.onmessage = async (e) => {
       let sortedBag = e.data.sort(sortBag);
       let bagObject = { id: getItem(sortedBag), bag: sortedBag };
-      if (!craftableItemsGivenPickups.has(bagSum(sortedBag))) {
-        craftableItemsGivenPickups.set(bagSum(sortedBag), bagObject);
+      if (!craftableItemsGivenPickups.has(await bagHash(sortedBag))) {
+        craftableItemsGivenPickups.set(await bagHash(sortedBag), bagObject);
       }
       craftableItemsGivenPickups = craftableItemsGivenPickups;
+      // console.log(e.data);
     };
 
-    randPickupWorker.onmessage = (e) => {
-      //   if (!(e.data == "Done")) {
-      //     let sortedBag = e.data.sort(sortBag);
-      //     let bagObject = { id: getItem(sortedBag), bag: sortedBag };
-      //     if (!craftableItemsGivenPickups.has(bagSum(sortedBag))) {
-      //       craftableItemsGivenPickups.set(bagSum(sortedBag), bagObject);
-      //     }
-      //     craftableItemsGivenPickups = craftableItemsGivenPickups;
-      //   } else {
-      //     showCrafts = true;
-      //   }
-      console.log(e.data);
-    };
-
-    let items = [];
-    let itemtypes = 0;
-    for (let [key, value] of testpickups) {
-      if (value != 0) {
-        itemtypes++;
-      }
-      for (let i = 0; i < value; i++) {
-        items.push(key);
-      }
-    }
-    console.log(items)
-    
-    randPickupWorker.postMessage(items);
-    // console.log(combinations(items, 8, 8));
-
-    for (let i = 0; i < 29; i++) {
-      for (let j = 0; j < 29; j++) {
-        setTimeout(() => {
-          //   proceduralWorker.postMessage([i + 1, j + 1]);
-        }, 1000 * (i + j));
-      }
-    }
+    randPickupWorker.postMessage(testpickups);
   });
 </script>
 
@@ -390,17 +342,6 @@
             <div class="flex flex-col gap-8">
               <div class="flex flex-row justify-center">
                 <div class="tooltip" data-tip={Items[item.id].name}>
-                  {#await preload("/src/lib/images/collectibles/Collectible_" + encodeURI(Items[item.id].name
-                          .replaceAll(" ", "_")
-                          .replaceAll("/", "_")) + "_icon.png")}
-                    <div class="skeleton w-32 h-32" />
-                  {:then base64}
-                    <img
-                      class="scale-200 pixelated"
-                      src={base64}
-                      alt={Items[item.id].name.replaceAll(" ", "_")}
-                    />
-                  {/await}
                   <img
                     class="scale-200 pixelated"
                     src="/src/lib/images/collectibles/Collectible_{encodeURI(

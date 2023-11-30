@@ -4,13 +4,13 @@ let combinations = new Map<string, number[]>();
 
 self.onmessage = async (e: MessageEvent) => {
   const pickups = e.data;
-  let items = [];
+  let items: number[] = [];
   let itemtypes = 0;
   for (let pickup in pickups) {
     if (pickups[pickup] != 0) {
       itemtypes++;
       for (let i = 0; i < 8; i++) {
-        items.push(pickup);
+        items.push(parseInt(pickup));
       }
     }
   }
@@ -30,7 +30,7 @@ self.onmessage = async (e: MessageEvent) => {
   let retries = 0;
   while (combinations.size < combo) {
     let itemsTemp = [...items];
-    let newBag = [];
+    let newBag: number[] = [];
     for (let i = 0; i < 8; i++) {
       let randPick = Math.floor(Math.random() * itemsTemp.length);
       newBag.push(itemsTemp[randPick]);

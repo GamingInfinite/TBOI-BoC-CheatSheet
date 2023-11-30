@@ -16,6 +16,27 @@
   let sortedItems = new Map<string, { id: number; bag: number[] }>();
   let showCrafts = true;
 
+  let staticRecipes = new Map<string, number>();
+  staticRecipes.set("11111111", 45);
+  staticRecipes.set("11111177", 639);
+  staticRecipes.set("2929292929292929", 36);
+  staticRecipes.set("22222222", 686);
+  staticRecipes.set("44444444", 182);
+  staticRecipes.set("2525252525252525", 580);
+  staticRecipes.set("88888888", 177);
+  staticRecipes.set("2222222222222222", 75);
+  staticRecipes.set("1515151515151515", 37);
+  staticRecipes.set("1717171717171717", 483);
+  staticRecipes.set("1515151515151616", 483);
+  staticRecipes.set("1212121212121212", 343);
+  staticRecipes.set("12444445", 331);
+  staticRecipes.set("322222222222222", 654);
+  staticRecipes.set("2121212121212121", 85)
+  staticRecipes.set("66666666", 628)
+  staticRecipes.set("1212121212121313", 175)
+  staticRecipes.set("2424242424242424", 489)
+  staticRecipes.set("33333333", 118)
+
   let pickups = {};
   pickups[Pickups.HEART.id] = 8;
   pickups[Pickups.KEY.id] = 8;
@@ -144,6 +165,10 @@
   }
 
   function getItem(bag: number[]) {
+    if (staticRecipes.get(bag.toString().replaceAll(",", ""))) {
+      return staticRecipes.get(bag.toString().replaceAll(",", ""));
+    }
+
     let item_count: number[] = [];
     for (let i = 0; i < 0x1f; i++) {
       item_count[i] = 0;
@@ -322,7 +347,7 @@
         on:click={() => {
           convseed = str2seed();
           resetWorker();
-          craftableItems.clear()
+          craftableItems.clear();
 
           randPickupWorker.postMessage(pickups);
         }}>Submit Seed</button

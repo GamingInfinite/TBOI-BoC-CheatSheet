@@ -9,9 +9,18 @@
 
   let randPickupWorker: Worker;
 
+  let settingsModal: HTMLDialogElement;
+
+  //#region Options
+  let showQuality = false;
+  //#endregion
+
+  let searchBar: string;
+  let searchID: number;
+  let searchArray: number[] = [];
+
   let craftableItems = new Map<string, { id: number; bag: number[] }>();
   let sortedItems = new Map<string, { id: number; bag: number[] }>();
-  let showCrafts = true;
 
   //#region Static Recipes
   let staticRecipes = new Map<string, number>();
@@ -373,7 +382,7 @@
               <div class="tooltip m-4" data-tip={name}>
                 <img
                   class="pixelated"
-                  class:scale-200={!(id == 17)}
+                  class:scale-200={!(id == 17 || id == 29)}
                   src="/images/pickups/{id}.png"
                   alt={name}
                 />
@@ -405,29 +414,82 @@
         </div>
       {/if}
     </div>
+    <div class="flex flex-row justify-center relative">
+      <div>
+        <input
+          type="text"
+          placeholder="Search Item..."
+          class="input input-bordered w-full max-w-xs"
+          bind:value={searchBar}
+          on:input={() => {
+            searchID = -1;
+            if (searchBar != "") {
+              searchArray = [];
+              for (let item in Items) {
+                let name = Items[item].name.toLowerCase();
+                if (name.search(searchBar.toLowerCase()) != -1) {
+                  searchArray.push(parseInt(item));
+                }
+              }
+              searchArray = searchArray;
+              console.log(searchArray);
+            }
+          }}
+        />
+        {#if searchBar != undefined && searchBar != "" && (searchID == undefined || searchID == -1)}
+          <div
+            class="absolute flex flex-col bg-base-200 rounded-xl z-50"
+          >
+            {#each searchArray as item}
+              {#if Items[item] != undefined}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <div
+                  class="flex flex-row gap-8 p-8 hover:bg-base-300 hover:rounded-xl"
+                  on:click={() => {
+                    searchID = item;
+                  }}
+                >
+                  <img
+                    class="scale-200 pixelated"
+                    src="/images/collectibles/Collectible_{Items[item].name
+                      .replaceAll(' ', '_')
+                      .replaceAll('/', '_')
+                      .replaceAll('?', 'q')
+                      .replaceAll('<', 'l')}_icon.png"
+                    alt={Items[item].name.replaceAll(" ", "_")}
+                  />
+                  <div>{Items[item].name}</div>
+                </div>
+              {/if}
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </div>
     <div class="flex flex-row justify-center m-8">
       <div class="grid grid-cols-10 gap-8">
-        {#if showCrafts}
-          {#each [...sortedItems.values()] as item}
+        {#each [...sortedItems.values()] as item}
+          {#if item.id == searchID}
             <div class="flex flex-col gap-8">
               <div class="flex flex-row justify-center gap-4">
                 <div class="tooltip" data-tip={Items[item.id].name}>
                   <img
                     class="scale-200 pixelated"
-                    src="/images/collectibles/Collectible_{encodeURI(
-                      Items[item.id].name
-                        .replaceAll(' ', '_')
-                        .replaceAll('/', '_')
-                        .replaceAll('?', '%3F')
-                    )}_icon.png"
+                    src="/images/collectibles/Collectible_{Items[item.id].name
+                      .replaceAll(' ', '_')
+                      .replaceAll('/', '_')
+                      .replaceAll('?', 'q')
+                      .replaceAll('<', 'l')}_icon.png"
                     alt={Items[item.id].name.replaceAll(" ", "_")}
                   />
                 </div>
-                <img
-                  class="w-8 h-8 pixelated"
-                  src="/images/qualities/{Items[item.id].quality}.png"
-                  alt={Items[item.id].quality}
-                />
+                {#if showQuality}
+                  <img
+                    class="w-8 h-8 pixelated"
+                    src="/images/qualities/{Items[item.id].quality}.png"
+                    alt={Items[item.id].quality}
+                  />
+                {/if}
               </div>
               <div class="flex flex-row justify-center">
                 <div class="grid grid-cols-4 place-items-center gap-4">
@@ -449,12 +511,100 @@
                 </div>
               </div>
             </div>
-          {/each}
-        {/if}
+          {:else if searchID == -1 || searchID == undefined}
+            <div class="flex flex-col gap-8">
+              <div class="flex flex-row justify-center gap-4">
+                <div class="tooltip" data-tip={Items[item.id].name}>
+                  <img
+                    class="scale-200 pixelated"
+                    src="/images/collectibles/Collectible_{Items[item.id].name
+                      .replaceAll(' ', '_')
+                      .replaceAll('/', '_')
+                      .replaceAll('?', 'q')
+                      .replaceAll('<', 'l')}_icon.png"
+                    alt={Items[item.id].name.replaceAll(" ", "_")}
+                  />
+                </div>
+                {#if showQuality}
+                  <img
+                    class="w-8 h-8 pixelated"
+                    src="/images/qualities/{Items[item.id].quality}.png"
+                    alt={Items[item.id].quality}
+                  />
+                {/if}
+              </div>
+              <div class="flex flex-row justify-center">
+                <div class="grid grid-cols-4 place-items-center gap-4">
+                  {#each item.bag as pickup}
+                    {#if pickup == 14}
+                      <img
+                        class="scale-150 pixelated"
+                        src="/images/pickups/{pickup}.gif"
+                        alt={Pickups[pickup]}
+                      />
+                    {:else}
+                      <img
+                        class="scale-150 pixelated"
+                        src="/images/pickups/{pickup}.png"
+                        alt={Pickups[pickup]}
+                      />
+                    {/if}
+                  {/each}
+                </div>
+              </div>
+            </div>
+          {/if}
+        {/each}
       </div>
     </div>
   </div>
 </div>
+
+<button
+  class="absolute top-8 right-8 btn-ghost w-12 h-12 rounded-xl z-50"
+  on:click={() => {
+    settingsModal.showModal();
+  }}
+>
+  ⚙️
+</button>
+
+<dialog bind:this={settingsModal} class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Options</h3>
+    <div class="flex flex-col">
+      <div class="flex flex-row gap-2 items-center">
+        <div>Show Quality</div>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-label-has-associated-control -->
+        <label
+          class="swap swap-flip"
+          class:swap-active={showQuality}
+          on:click={() => {
+            showQuality = !showQuality;
+          }}
+        >
+          <img
+            class="swap-on w-8 h-8 pixelated"
+            src="/images/qualities/yes.png"
+            alt="on"
+          />
+          <img
+            class="swap-off w-8 h-8 pixelated"
+            src="/images/qualities/no.png"
+            alt="off"
+          />
+        </label>
+      </div>
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <!-- if there is a button in form, it will close the modal -->
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
 
 <style>
   .isaac-font {

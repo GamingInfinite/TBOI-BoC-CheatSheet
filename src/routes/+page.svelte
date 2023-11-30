@@ -1,10 +1,11 @@
 <script lang="ts">
   import { bagHash, sortBag, sortCollection } from "$lib/bagUtils";
   import { ItemPools, Items, Pickups } from "$lib/data";
-  import { onMount } from "svelte";
 
   let seed: string;
   let convseed: number;
+
+  let seedChange: boolean = false;
 
   let randPickupWorker: Worker;
 
@@ -12,6 +13,7 @@
   let sortedItems = new Map<string, { id: number; bag: number[] }>();
   let showCrafts = true;
 
+  //#region Static Recipes
   let staticRecipes = new Map<string, number>();
   staticRecipes.set("11111111", 45);
   staticRecipes.set("11111177", 639);
@@ -27,16 +29,14 @@
   staticRecipes.set("1212121212121212", 343);
   staticRecipes.set("12444445", 331);
   staticRecipes.set("322222222222222", 654);
-  staticRecipes.set("2121212121212121", 85)
-  staticRecipes.set("66666666", 628)
-  staticRecipes.set("1212121212121313", 175)
-  staticRecipes.set("2424242424242424", 489)
-  staticRecipes.set("33333333", 118)
+  staticRecipes.set("2121212121212121", 85);
+  staticRecipes.set("66666666", 628);
+  staticRecipes.set("1212121212121313", 175);
+  staticRecipes.set("2424242424242424", 489);
+  staticRecipes.set("33333333", 118);
+  //#endregion
 
   let pickups = {};
-  pickups[Pickups.HEART.id] = 8;
-  pickups[Pickups.KEY.id] = 8;
-  pickups[Pickups.BOMB.id] = 8;
   for (let i = 1; i < 30; i++) {
     if (pickups[i] == undefined) {
       pickups[i] = 0;
@@ -316,13 +316,6 @@
       }
     };
   }
-
-  onMount(async () => {
-    convseed = str2seed("JKD9 Z0C9");
-    resetWorker();
-
-    randPickupWorker.postMessage(pickups);
-  });
 </script>
 
 <svelte:head>
@@ -337,6 +330,20 @@
         placeholder="Input Seed"
         class="input input-bordered w-full max-w-xs"
         bind:value={seed}
+        on:input={() => {
+          let tempSeed = seed.replaceAll(" ", "");
+          console.log(tempSeed, tempSeed.length);
+          if (tempSeed.length != 8) {
+            seedChange = false;
+          } else {
+            seedChange = true;
+          }
+          seed = seed.toUpperCase();
+          seed = seed.replaceAll("I", "1");
+          seed = seed.replaceAll("O", "0");
+          seed = seed.replaceAll("U", "V");
+          seed = seed.replaceAll("5", "V");
+        }}
       />
       <button
         class="btn btn-accent"
@@ -346,7 +353,8 @@
           craftableItems.clear();
 
           randPickupWorker.postMessage(pickups);
-        }}>Submit Seed</button
+        }}
+        disabled={!seedChange}>Submit Seed</button
       >
     </div>
     <div class="flex flex-row gap-4 justify-center">
@@ -374,12 +382,15 @@
             <input
               type="number"
               bind:value={pickups[id]}
-              on:change={() => {
-                craftableItems.clear();
-                resetWorker();
-                randPickupWorker.postMessage(pickups);
+              on:input={() => {
+                if (seed.length == 9) {
+                  craftableItems.clear();
+                  resetWorker();
+                  randPickupWorker.postMessage(pickups);
+                }
               }}
-              class="input w-16"
+              class="input input-bordered w-16"
+              placeholder="0"
               min="0"
               max="8"
             />

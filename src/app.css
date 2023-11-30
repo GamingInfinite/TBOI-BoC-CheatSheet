@@ -12,8 +12,16 @@
 .customNumber {
   & input[type="number"]::-webkit-inner-spin-button {
     appearance: none;
+    background: url("/images/counter.png") no-repeat center center;
+    background-size: 80%;
     width: 1.3em;
     height: 3em;
     @apply absolute top-0 right-0 bottom-0 bg-base-300 text-base-content;
+  }
+}
+
+.customNumber:hover {
+  & input[type="number"]::-webkit-inner-spin-button {
+    opacity: .5;
   }
 }

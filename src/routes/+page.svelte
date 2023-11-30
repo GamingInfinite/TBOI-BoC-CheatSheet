@@ -3,10 +3,6 @@
   import { ItemPools, Items, Pickups } from "$lib/data";
   import { onMount } from "svelte";
 
-  const pictures = import.meta.glob("/src/lib/images/*/*", {
-    query: { enhanced: true },
-  });
-
   let seed: string;
   let convseed: number;
 
@@ -361,7 +357,7 @@
               <div class="tooltip m-4" data-tip={name}>
                 <img
                   class="pixelated scale-200"
-                  src="/src/lib/images/pickups/{id}.gif"
+                  src="/images/pickups/{id}.gif"
                   alt={name}
                 />
               </div>
@@ -370,7 +366,7 @@
                 <img
                   class="pixelated"
                   class:scale-200={!(id == 17)}
-                  src="/src/lib/images/pickups/{id}.png"
+                  src="/images/pickups/{id}.png"
                   alt={name}
                 />
               </div>
@@ -407,7 +403,7 @@
                 <div class="tooltip" data-tip={Items[item.id].name}>
                   <img
                     class="scale-200 pixelated"
-                    src="/src/lib/images/collectibles/Collectible_{encodeURI(
+                    src="/images/collectibles/Collectible_{encodeURI(
                       Items[item.id].name
                         .replaceAll(' ', '_')
                         .replaceAll('/', '_')
@@ -418,7 +414,7 @@
                 </div>
                 <img
                   class="w-8 h-8 pixelated"
-                  src="/src/lib/images/qualities/{Items[item.id].quality}.png"
+                  src="/images/qualities/{Items[item.id].quality}.png"
                   alt={Items[item.id].quality}
                 />
               </div>
@@ -428,13 +424,13 @@
                     {#if pickup == 14}
                       <img
                         class="scale-150 pixelated"
-                        src="/src/lib/images/pickups/{pickup}.gif"
+                        src="/images/pickups/{pickup}.gif"
                         alt={Pickups[pickup]}
                       />
                     {:else}
                       <img
                         class="scale-150 pixelated"
-                        src="/src/lib/images/pickups/{pickup}.png"
+                        src="/images/pickups/{pickup}.png"
                         alt={Pickups[pickup]}
                       />
                     {/if}

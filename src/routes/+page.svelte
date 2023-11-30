@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { bagHash, sortBag, sortCollection } from "$lib/bagUtils";
   import { ItemPools, Items, Pickups } from "$lib/data";
   import { onMount } from "svelte";
 
@@ -11,13 +12,19 @@
 
   let randPickupWorker: Worker;
 
-  let craftableItemsGivenPickups = new Map<string, { id: number; bag: number[] }>();
+  let craftableItems = new Map<string, { id: number; bag: number[] }>();
+  let sortedItems = new Map<string, { id: number; bag: number[] }>();
   let showCrafts = true;
 
-  let testpickups = new Map<number, number>();
-  testpickups.set(Pickups.HEART.id, 8);
-  testpickups.set(Pickups.KEY.id, 8);
-  testpickups.set(Pickups.BOMB.id, 8);
+  let pickups = {};
+  pickups[Pickups.HEART.id] = 8;
+  pickups[Pickups.KEY.id] = 8;
+  pickups[Pickups.BOMB.id] = 8;
+  for (let i = 1; i < 30; i++) {
+    if (pickups[i] == undefined) {
+      pickups[i] = 0;
+    }
+  }
 
   function str2seed(iseed?: string) {
     if (iseed) {
@@ -247,24 +254,18 @@
     return selected;
   }
 
-  function sortBag(a, b) {
-    return a - b;
+  function resortItems() {
+    sortedItems = new Map(
+      Array.from(craftableItems)
+        .sort(sortCollection)
+        .map((obj) => [obj[0], obj[1]])
+    );
   }
 
-  function sortCollection(a, b) {
-    //Do Later, sort by qualities then ids
-  }
-
-  async function bagHash(bag: number[]) {
-    const bagEncode = new TextEncoder().encode(bag.join(""));
-    const buffer = await window.crypto.subtle.digest("SHA-256", bagEncode);
-    const hashArray = Array.from(new Uint8Array(buffer));
-    const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-    return hash;
-  }
-
-  onMount(async () => {
-    convseed = str2seed("JKD9 Z0C9");
+  function resetWorker() {
+    if (randPickupWorker != undefined) {
+      randPickupWorker.terminate();
+    }
     randPickupWorker = new Worker(
       new URL("../lib/workers/randPickupWorker.ts", import.meta.url),
       { type: "module" }
@@ -273,19 +274,38 @@
     randPickupWorker.onmessage = async (e) => {
       let sortedBag = e.data.sort(sortBag);
       let bagObject = { id: getItem(sortedBag), bag: sortedBag };
-      if (!craftableItemsGivenPickups.has(await bagHash(sortedBag))) {
-        craftableItemsGivenPickups.set(await bagHash(sortedBag), bagObject);
+      let hash = await bagHash(sortedBag);
+      let itemCounts = {};
+      bagSkip: {
+        for (let index = 0; index < sortedBag.length; index++) {
+          if (!itemCounts[sortedBag[index]]) {
+            itemCounts[sortedBag[index]] = 0;
+          }
+          itemCounts[sortedBag[index]]++;
+        }
+        for (let pickup in itemCounts) {
+          if (itemCounts[pickup] > pickups[pickup]) {
+            break bagSkip;
+          }
+        }
+        if (!craftableItems.has(hash)) {
+          craftableItems.set(hash, bagObject);
+        }
+        resortItems();
       }
-      craftableItemsGivenPickups = craftableItemsGivenPickups;
-      // console.log(e.data);
     };
+  }
 
-    randPickupWorker.postMessage(testpickups);
+  onMount(async () => {
+    convseed = str2seed("JKD9 Z0C9");
+    resetWorker();
+
+    randPickupWorker.postMessage(pickups);
   });
 </script>
 
 <svelte:head>
-  <title>TableTalk</title>
+  <title>Bag of Crafting Cheat Sheet</title>
 </svelte:head>
 
 <div class="flex flex-row justify-center">
@@ -301,30 +321,48 @@
         class="btn btn-accent"
         on:click={() => {
           convseed = str2seed();
+          resetWorker();
+          craftableItems.clear()
+
+          randPickupWorker.postMessage(pickups);
         }}>Submit Seed</button
       >
     </div>
     <div class="flex flex-row gap-4 justify-center">
       <div class="grid grid-cols-10 place-items-center">
         {#each Object.entries(Pickups) as [_, { name, id }]}
-          {#if id == 14}
-            <div class="tooltip m-4" data-tip={name}>
-              <img
-                class="pixelated scale-200"
-                src="/src/lib/images/pickups/{id}.gif"
-                alt={name}
-              />
-            </div>
-          {:else}
-            <div class="tooltip m-4" data-tip={name}>
-              <img
-                class="pixelated"
-                class:scale-200={!(id == 17)}
-                src="/src/lib/images/pickups/{id}.png"
-                alt={name}
-              />
-            </div>
-          {/if}
+          <div class="flex flex-row items-center customNumber">
+            {#if id == 14}
+              <div class="tooltip m-4" data-tip={name}>
+                <img
+                  class="pixelated scale-200"
+                  src="/src/lib/images/pickups/{id}.gif"
+                  alt={name}
+                />
+              </div>
+            {:else}
+              <div class="tooltip m-4" data-tip={name}>
+                <img
+                  class="pixelated"
+                  class:scale-200={!(id == 17)}
+                  src="/src/lib/images/pickups/{id}.png"
+                  alt={name}
+                />
+              </div>
+            {/if}
+            <input
+              type="number"
+              bind:value={pickups[id]}
+              on:change={() => {
+                craftableItems.clear();
+                resetWorker();
+                randPickupWorker.postMessage(pickups);
+              }}
+              class="input w-16"
+              min="0"
+              max="8"
+            />
+          </div>
         {/each}
       </div>
       {#if seed}
@@ -335,12 +373,12 @@
         </div>
       {/if}
     </div>
-    <div class="flex flex-row justify-center mx-8">
+    <div class="flex flex-row justify-center m-8">
       <div class="grid grid-cols-10 gap-8">
         {#if showCrafts}
-          {#each [...craftableItemsGivenPickups.values()] as item}
+          {#each [...sortedItems.values()] as item}
             <div class="flex flex-col gap-8">
-              <div class="flex flex-row justify-center">
+              <div class="flex flex-row justify-center gap-4">
                 <div class="tooltip" data-tip={Items[item.id].name}>
                   <img
                     class="scale-200 pixelated"
@@ -348,10 +386,16 @@
                       Items[item.id].name
                         .replaceAll(' ', '_')
                         .replaceAll('/', '_')
+                        .replaceAll('?', '%3F')
                     )}_icon.png"
                     alt={Items[item.id].name.replaceAll(" ", "_")}
                   />
                 </div>
+                <img
+                  class="w-8 h-8 pixelated"
+                  src="/src/lib/images/qualities/{Items[item.id].quality}.png"
+                  alt={Items[item.id].quality}
+                />
               </div>
               <div class="flex flex-row justify-center">
                 <div class="grid grid-cols-4 place-items-center gap-4">

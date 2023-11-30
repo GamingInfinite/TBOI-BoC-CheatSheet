@@ -1,22 +1,29 @@
+import { bagHash, sortBag } from "$lib/bagUtils";
+
 let combinations = new Map<string, number[]>();
 
 self.onmessage = async (e: MessageEvent) => {
   const pickups = e.data;
   let items = [];
   let itemtypes = 0;
-  for (let [key, value] of pickups) {
-    if (value != 0) {
+  for (let pickup in pickups) {
+    if (pickups[pickup] != 0) {
       itemtypes++;
-    }
-    for (let i = 0; i < value; i++) {
-      items.push(key);
+      for (let i = 0; i < 8; i++) {
+        items.push(pickup);
+      }
     }
   }
 
-  let combo =
-    factorial(itemtypes + 8 - 1) /
-    (factorial(8) * factorial(itemtypes + 8 - 1 - 8));
-    
+  let combo;
+  if (itemtypes == 1) {
+    combo = 1;
+  } else {
+    combo =
+      factorial(itemtypes + 8 - 1) /
+      (factorial(8) * factorial(itemtypes + 8 - 1 - 8));
+  }
+
   if (combo == 0) {
     combo++;
   }
@@ -37,8 +44,7 @@ self.onmessage = async (e: MessageEvent) => {
       retries++;
     }
   }
-  console.log(combinations.size, retries);
-  console.log([...combinations.values()]);
+  console.log("Done")
 };
 
 function factorial(num: number) {
@@ -46,16 +52,4 @@ function factorial(num: number) {
     return num;
   }
   return num * factorial(num - 1);
-}
-
-async function bagHash(bag: number[]) {
-  const bagEncode = new TextEncoder().encode(bag.join(""));
-  const buffer = await crypto.subtle.digest("SHA-256", bagEncode);
-  const hashArray = Array.from(new Uint8Array(buffer));
-  const hash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-  return hash;
-}
-
-function sortBag(a, b) {
-  return a - b;
 }

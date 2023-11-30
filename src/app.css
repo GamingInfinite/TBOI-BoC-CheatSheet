@@ -8,3 +8,12 @@
   font-weight: 500;
   src: url("/fonts/isaac_font.ttf");
 }
+
+.customNumber {
+  & input[type="number"]::-webkit-inner-spin-button {
+    appearance: none;
+    width: 1.3em;
+    height: 3em;
+    @apply absolute top-0 right-0 bottom-0 bg-base-300 text-base-content;
+  }
+}

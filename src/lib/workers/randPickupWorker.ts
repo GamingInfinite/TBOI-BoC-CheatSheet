@@ -24,7 +24,7 @@ self.onmessage = async (e: MessageEvent) => {
       (factorial(8) * factorial(itemtypes + 8 - 1 - 8));
   }
 
-  if (combo == 0) {
+  if (combo == 0 && items.length >= 8 ) {
     combo++;
   }
   let retries = 0;
@@ -48,7 +48,7 @@ self.onmessage = async (e: MessageEvent) => {
 };
 
 function factorial(num: number) {
-  if (num == 1) {
+  if (num <= 1) {
     return num;
   }
   return num * factorial(num - 1);

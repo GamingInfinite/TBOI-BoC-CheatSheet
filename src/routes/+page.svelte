@@ -58,6 +58,9 @@
     }
 
     let dict = [];
+    for (let i = 0; i < 255; i++) {
+      dict[i] = 0xff;
+    }
     for (let i = 0; i < 32; i++) {
       dict["ABCDEFGHJKLMNPQRSTWXYZ01234V6789".charCodeAt(i)] = i;
     }
@@ -72,25 +75,28 @@
         j--;
       }
       numseed[j] = dict[seed.charCodeAt(i)];
+      if (numseed[j] == 0xff) {
+        return 0;
+      }
     }
-    console.log(numseed);
 
     let v8 = 0;
     let v10: number;
 
+    //Following Code is completely copied, and relevant to 'Some Seeds not Verifying'
     for (
       let i =
-        (numseed[6] >>> 3) |
-        ((4 *
-          (numseed[5] |
-            (32 *
-              (numseed[4] |
-                (32 *
-                  (numseed[3] |
-                    (32 *
-                      (numseed[2] |
-                        (32 * (numseed[1] | (32 * numseed[0]))))))))))) ^
-          0xfef7ffd);
+        ((numseed[6] >>> 3) |
+          (4 *
+            (numseed[5] |
+              (32 *
+                (numseed[4] |
+                  (32 *
+                    (numseed[3] |
+                      (32 *
+                        (numseed[2] |
+                          (32 * (numseed[1] | (32 * numseed[0])))))))))))) ^
+        0xfef7ffd;
       i != 0;
       v8 = ((v10 >>> 7) + 2 * v10) & 0xff
     ) {
@@ -100,19 +106,23 @@
 
     if (v8 == (numseed[7] | (0xff & (32 * numseed[6])))) {
       return (
-        (numseed[6] >>> 3) |
-        ((4 *
-          (numseed[5] |
-            (32 *
-              (numseed[4] |
-                (32 *
-                  (numseed[3] |
-                    (32 *
-                      (numseed[2] |
-                        (32 * (numseed[1] | (32 * numseed[0]))))))))))) ^
-          0xfef7ffd)
+        ((numseed[6] >>> 3) |
+          (4 *
+            (numseed[5] |
+              (32 *
+                (numseed[4] |
+                  (32 *
+                    (numseed[3] |
+                      (32 *
+                        (numseed[2] |
+                          (32 * (numseed[1] | (32 * numseed[0])))))))))))) ^
+        0xfef7ffd
       );
     }
+
+    console.log("Seed is Not Real");
+    console.log(numseed);
+    console.log(v10);
     return 0;
   }
 
@@ -341,7 +351,6 @@
         bind:value={seed}
         on:input={() => {
           let tempSeed = seed.replaceAll(" ", "");
-          console.log(tempSeed, tempSeed.length);
           if (tempSeed.length != 8) {
             seedChange = false;
           } else {
@@ -437,9 +446,7 @@
           }}
         />
         {#if searchBar != undefined && searchBar != "" && (searchID == undefined || searchID == -1)}
-          <div
-            class="absolute flex flex-col bg-base-200 rounded-xl z-50"
-          >
+          <div class="absolute flex flex-col bg-base-200 rounded-xl z-50">
             {#each searchArray as item}
               {#if Items[item] != undefined}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->

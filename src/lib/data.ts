@@ -1,121 +1,121 @@
 export const Pickups = {
-    HEART: {
-        name: "Heart",
-        id: 1
-    },
-    SOULHEART: {
-        name: "Soul Heart",
-        id: 2
-    },
-    BLACKHEART: {
-        name: "Black Heart",
-        id: 3
-    },
-    ETERNALHEART: {
-        name: "Eternal Heart",
-        id: 4
-    },
-    GOLDHEART: {
-        name: "Gold Heart",
-        id: 5
-    },
-    BONEHEART: {
-        name: "Bone Heart",
-        id: 6
-    },
-    ROTTENHEART: {
-        name: "Rotten Heart",
-        id: 7
-    },
-    PENNY: {
-        name: "Penny",
-        id: 8
-    },
-    NICKEL: {
-        name: "Nickel",
-        id: 9
-    },
-    DIME: {
-        name: "Dime",
-        id: 10
-    },
-    LUCKYPENNY: {
-        name: "Lucky Penny",
-        id: 11
-    },
-    KEY: {
-        name: "Key",
-        id: 12
-    },
-    GOLDKEY: {
-        name: "Gold Key",
-        id: 13
-    },
-    CHARGEDKEY: {
-        name: "Charged Key",
-        id: 14
-    },
-    BOMB: {
-        name: "Bomb",
-        id: 15
-    },
-    GOLDBOMB: {
-        name: "Gold Bomb",
-        id: 16
-    },
-    MEGABOMB: {
-        name: "Giga Bomb",
-        id: 17
-    },
-    MICROBATTERY: {
-        name: "Micro Battery",
-        id: 18
-    },
-    BATTERY: {
-        name: "Lil\' Battery",
-        id: 19
-    },
-    MEGABATTERY: {
-        name: "Mega Battery",
-        id: 20
-    },
-    CARD: {
-        name: "Card",
-        id: 21
-    },
-    PILL: {
-        name: "Pill",
-        id: 22
-    },
-    RUNE: {
-        name: "Rune",
-        id: 23
-    },
-    DICESHARD: {
-        name: "Dice Shard",
-        id: 24
-    },
-    CRACKEDKEY: {
-        name: "Cracked Key",
-        id: 25
-    },
-    GOLDPENNY: {
-        name: "Golden Penny",
-        id: 26
-    },
-    GOLDPILL: {
-        name: "Gold Pill",
-        id: 27
-    },
-    GOLDBATTERY: {
-        name: "Gold Battery",
-        id: 28
-    },
-    POOPNUGGET: {
-        name: "Poop Nugget",
-        id: 29
-    }
-}
+  HEART: {
+    name: "Heart",
+    id: 1,
+  },
+  SOULHEART: {
+    name: "Soul Heart",
+    id: 2,
+  },
+  BLACKHEART: {
+    name: "Black Heart",
+    id: 3,
+  },
+  ETERNALHEART: {
+    name: "Eternal Heart",
+    id: 4,
+  },
+  GOLDHEART: {
+    name: "Gold Heart",
+    id: 5,
+  },
+  BONEHEART: {
+    name: "Bone Heart",
+    id: 6,
+  },
+  ROTTENHEART: {
+    name: "Rotten Heart",
+    id: 7,
+  },
+  PENNY: {
+    name: "Penny",
+    id: 8,
+  },
+  NICKEL: {
+    name: "Nickel",
+    id: 9,
+  },
+  DIME: {
+    name: "Dime",
+    id: 10,
+  },
+  LUCKYPENNY: {
+    name: "Lucky Penny",
+    id: 11,
+  },
+  KEY: {
+    name: "Key",
+    id: 12,
+  },
+  GOLDKEY: {
+    name: "Gold Key",
+    id: 13,
+  },
+  CHARGEDKEY: {
+    name: "Charged Key",
+    id: 14,
+  },
+  BOMB: {
+    name: "Bomb",
+    id: 15,
+  },
+  GOLDBOMB: {
+    name: "Gold Bomb",
+    id: 16,
+  },
+  MEGABOMB: {
+    name: "Giga Bomb",
+    id: 17,
+  },
+  MICROBATTERY: {
+    name: "Micro Battery",
+    id: 18,
+  },
+  BATTERY: {
+    name: "Lil' Battery",
+    id: 19,
+  },
+  MEGABATTERY: {
+    name: "Mega Battery",
+    id: 20,
+  },
+  CARD: {
+    name: "Card",
+    id: 21,
+  },
+  PILL: {
+    name: "Pill",
+    id: 22,
+  },
+  RUNE: {
+    name: "Rune",
+    id: 23,
+  },
+  DICESHARD: {
+    name: "Dice Shard",
+    id: 24,
+  },
+  CRACKEDKEY: {
+    name: "Cracked Key",
+    id: 25,
+  },
+  GOLDPENNY: {
+    name: "Golden Penny",
+    id: 26,
+  },
+  GOLDPILL: {
+    name: "Gold Pill",
+    id: 27,
+  },
+  GOLDBATTERY: {
+    name: "Gold Battery",
+    id: 28,
+  },
+  POOPNUGGET: {
+    name: "Poop Nugget",
+    id: 29,
+  },
+};
 
 export const ItemPools = {
   0: {
@@ -230,6 +230,7 @@ export const Items = {
     pools: {
       0: 1,
     },
+    flags: ["offensive"],
   },
   2: {
     name: "The Inner Eye",
@@ -237,6 +238,7 @@ export const Items = {
     pools: {
       0: 1,
     },
+    flags: ["offensive"],
   },
   3: {
     name: "Spoon Bender",
@@ -244,6 +246,7 @@ export const Items = {
     pools: {
       0: 1,
     },
+    flags: ["offensive"],
   },
   4: {
     name: "Cricket's Head",
@@ -251,6 +254,7 @@ export const Items = {
     pools: {
       0: 1,
     },
+    flags: ["offensive"],
   },
   5: {
     name: "My Reflection",
@@ -258,6 +262,7 @@ export const Items = {
     pools: {
       0: 1,
     },
+    flags: ["offensive"],
   },
   6: {
     name: "Number One",
@@ -265,6 +270,7 @@ export const Items = {
     pools: {
       0: 1,
     },
+    flags: ["offensive"],
   },
   7: {
     name: "Blood of the Martyr",
@@ -273,6 +279,7 @@ export const Items = {
       0: 1,
       4: 1,
     },
+    flags: ["offensive"],
   },
   8: {
     name: "Brother Bobby",
@@ -281,6 +288,7 @@ export const Items = {
       0: 1,
       3: 1,
     },
+    flags: ["offensive"],
   },
   9: {
     name: "Skatole",
@@ -309,6 +317,7 @@ export const Items = {
     pools: {
       0: 0.5,
     },
+    flags: ["offensive"],
   },
   13: {
     name: "The Virus",
@@ -316,6 +325,7 @@ export const Items = {
     pools: {
       0: 1,
     },
+    flags: ["nolostbr"],
   },
   14: {
     name: "Roid Rage",
@@ -324,6 +334,7 @@ export const Items = {
       0: 1,
       2: 1,
     },
+    flags: ["offensive"],
   },
   15: {
     name: "<3",
@@ -331,6 +342,7 @@ export const Items = {
     pools: {
       0: 1,
     },
+    flags: ["nolostbr"],
   },
   16: {
     name: "Raw Liver",
@@ -338,6 +350,7 @@ export const Items = {
     pools: {
       5: 1,
     },
+    flags: ["nolostbr"],
   },
   17: {
     name: "Skeleton Key",
@@ -346,6 +359,7 @@ export const Items = {
       0: 0.1,
       5: 1,
     },
+    flags: ["offensive"],
   },
   19: {
     name: "Boom!",
@@ -360,6 +374,7 @@ export const Items = {
     pools: {
       5: 1,
     },
+    flags: ["nolostbr"],
   },
   21: {
     name: "The Compass",
@@ -367,6 +382,7 @@ export const Items = {
     pools: {
       1: 1,
     },
+    flags: ["nogreed"],
   },
   22: {
     name: "Lunch",
@@ -374,6 +390,7 @@ export const Items = {
     pools: {
       2: 1,
     },
+    flags: ["nolostbr"],
   },
   23: {
     name: "Dinner",
@@ -381,6 +398,7 @@ export const Items = {
     pools: {
       2: 1,
     },
+    flags: ["nolostbr"],
   },
   24: {
     name: "Dessert",
@@ -388,6 +406,7 @@ export const Items = {
     pools: {
       2: 1,
     },
+    flags: ["nolostbr"],
   },
   25: {
     name: "Breakfast",
@@ -395,6 +414,7 @@ export const Items = {
     pools: {
       2: 1,
     },
+    flags: ["nolostbr"],
   },
   26: {
     name: "Rotten Meat",
@@ -402,6 +422,7 @@ export const Items = {
     pools: {
       2: 1,
     },
+    flags: ["nolostbr"],
   },
   27: {
     name: "Wooden Spoon",
@@ -506,6 +527,7 @@ export const Items = {
       0: 1,
     },
     name: "Kamikaze!",
+    flags: ["nolostbr"],
   },
   41: {
     quality: 0,
@@ -534,6 +556,7 @@ export const Items = {
       0: 1,
     },
     name: "Yum Heart",
+    flags: ["nolostbr"],
   },
   46: {
     name: "Lucky Foot",
@@ -592,6 +615,7 @@ export const Items = {
     pools: {
       1: 1,
     },
+    flags: ["nogreed"],
   },
   55: {
     name: "Mom's Eye",
@@ -627,6 +651,7 @@ export const Items = {
       1: 1,
     },
     name: "The Ladder",
+    flags: ["nolostbr"],
   },
   62: {
     quality: 1,
@@ -634,6 +659,7 @@ export const Items = {
       0: 1,
     },
     name: "Charm of the Vampire",
+    flags: ["nolostbr"],
   },
   63: {
     quality: 2,
@@ -643,7 +669,7 @@ export const Items = {
     name: "The Battery",
   },
   64: {
-    quality: 3,
+    quality: 2,
     pools: {
       1: 1,
     },
@@ -706,6 +732,7 @@ export const Items = {
       4: 1,
     },
     name: "Rosary",
+    flags: ["nolostbr"],
   },
   74: {
     quality: 1,
@@ -744,6 +771,7 @@ export const Items = {
       4: 1,
     },
     name: "Book of Revelations",
+    flags: ["nolostbr"],
   },
   79: {
     quality: 3,
@@ -776,6 +804,7 @@ export const Items = {
       3: 1,
     },
     name: "Lord of the Pit",
+    flags: ["nolostbr"],
   },
   83: {
     quality: 2,
@@ -842,6 +871,7 @@ export const Items = {
       2: 0.5,
     },
     name: "Super Bandage",
+    flags: ["nolostbr"],
   },
   93: {
     quality: 1,
@@ -870,6 +900,7 @@ export const Items = {
       0: 1,
     },
     name: "Little C.H.A.D.",
+    flags: ["nolostbr"],
   },
   97: {
     quality: 2,
@@ -886,6 +917,7 @@ export const Items = {
       4: 1,
     },
     name: "The Relic",
+    flags: ["nolostbr"],
   },
   99: {
     quality: 2,
@@ -959,6 +991,7 @@ export const Items = {
       4: 1,
     },
     name: "The Wafer",
+    flags: ["nolostbr"],
   },
   109: {
     quality: 3,
@@ -1012,6 +1045,7 @@ export const Items = {
       3: 1,
     },
     name: "Ouija Board",
+    flags: ["nolostbr"],
   },
   116: {
     quality: 2,
@@ -1026,6 +1060,7 @@ export const Items = {
       0: 1,
     },
     name: "Dead Bird",
+    flags: ["nolostbr"],
   },
   118: {
     quality: 4,
@@ -1320,6 +1355,7 @@ export const Items = {
       0: 1,
     },
     name: "Ankh",
+    flags: ["nochallenge"],
   },
   162: {
     quality: 1,
@@ -1870,6 +1906,7 @@ export const Items = {
       12: 1,
     },
     name: "Contract From Below",
+    flags: ["nogreed"],
   },
   242: {
     quality: 2,
@@ -1927,6 +1964,7 @@ export const Items = {
       1: 1,
     },
     name: "There's Options",
+    flags: ["nogreed"],
   },
   250: {
     quality: 1,
@@ -2367,6 +2405,7 @@ export const Items = {
       3: 1,
     },
     name: "Judas' Shadow",
+    flags: ["nochallenge"],
   },
   312: {
     quality: 2,
@@ -2505,6 +2544,7 @@ export const Items = {
       4: 1,
     },
     name: "Lazarus' Rags",
+    flags: ["nochallenge"],
   },
   333: {
     quality: 3,
@@ -2826,6 +2866,7 @@ export const Items = {
       1: 1,
     },
     name: "Restock",
+    flags: ["nogreed"],
   },
   377: {
     quality: 1,
@@ -3579,6 +3620,7 @@ export const Items = {
       0: 1,
     },
     name: "Clicker",
+    flags: ["nodaily", "nochallenge"],
   },
   483: {
     quality: 3,
@@ -4256,6 +4298,7 @@ export const Items = {
       12: 1,
     },
     name: "Red Key",
+    flags: ["nogreed"],
   },
   581: {
     quality: 4,
@@ -4604,6 +4647,7 @@ export const Items = {
       5: 1,
     },
     name: "R Key",
+    flags: ["nodaily", "nochallenge"],
   },
   637: {
     quality: 3,
@@ -4763,6 +4807,7 @@ export const Items = {
       1: 0.5,
     },
     name: "Card Reading",
+    flags: ["nogreed"],
   },
   661: {
     quality: 2,
@@ -4814,6 +4859,7 @@ export const Items = {
       1: 1,
     },
     name: "Options?",
+    flags: ["nogreed"],
   },
   671: {
     quality: 1,
@@ -4828,6 +4874,7 @@ export const Items = {
       3: 1,
     },
     name: "A Pound of Flesh",
+    flags: ["nokeeper", "nogreed"],
   },
   674: {
     quality: 2,
@@ -5003,6 +5050,7 @@ export const Items = {
       12: 0.5,
     },
     name: "Vanishing Twin",
+    flags: ["nogreed"],
   },
   698: {
     quality: 4,

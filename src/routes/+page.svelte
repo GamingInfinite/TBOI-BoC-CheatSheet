@@ -13,6 +13,7 @@
 
   //#region Options
   let showQuality = false;
+  let greedMode = false;
   //#endregion
 
   let searchBar: string;
@@ -273,10 +274,21 @@
       let pool = ItemPools[element.id].items;
       for (let i = 0; i < pool.length; i++) {
         const item = Items[pool[i]];
-        if (item.quality >= qualitymin && item.quality <= qualitymax) {
+        let check: boolean;
+        if (item.hasOwnProperty("flags")) {
+          check =
+            isSafeToGenerate(item.flags) &&
+            item.quality >= qualitymin &&
+            item.quality <= qualitymax;
+        } else {
+          check = item.quality >= qualitymin && item.quality <= qualitymax;
+        }
+        if (check) {
           let itemweight = item.pools[element.id] * element.weight;
           bag_weight += itemweight;
           collectibles[pool[i]] += itemweight;
+        } else {
+          console.log("item skipped")
         }
       }
     }
@@ -294,12 +306,27 @@
     return selected;
   }
 
+  function isSafeToGenerate(flags: string[]) {
+    if (greedMode && flags.includes("nogreed")) {
+      return false;
+    }
+    return true;
+  }
+
   function resortItems() {
     sortedItems = new Map(
       Array.from(craftableItems)
         .sort(sortCollection)
         .map((obj) => [obj[0], obj[1]])
     );
+  }
+
+  function clearPickups() {
+    craftableItems.clear();
+    resetWorker();
+    for (let i = 1; i < 30; i++) {
+      pickups[i] = 0;
+    }
   }
 
   function resetWorker() {
@@ -414,6 +441,9 @@
             />
           </div>
         {/each}
+        <div class="flex flex-row items-center">
+          <button class="btn btn-warning" on:click={clearPickups}>Clear</button>
+        </div>
       </div>
       {#if seed}
         <div class="flex flex-col">
@@ -579,7 +609,7 @@
 <dialog bind:this={settingsModal} class="modal">
   <div class="modal-box">
     <h3 class="font-bold text-lg">Options</h3>
-    <div class="flex flex-col">
+    <div class="flex flex-col gap-2">
       <div class="flex flex-row gap-2 items-center">
         <div>Show Quality</div>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -599,6 +629,35 @@
           <img
             class="swap-off w-8 h-8 pixelated"
             src="/images/qualities/no.png"
+            alt="off"
+          />
+        </label>
+      </div>
+      <div class="flex flex-row gap-2 items-center">
+        <div>
+          {#if greedMode}
+            Greed Mode
+          {:else}
+            Hard Mode
+          {/if}
+        </div>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-label-has-associated-control -->
+        <label
+          class="swap swap-flip"
+          class:swap-active={greedMode}
+          on:click={() => {
+            greedMode = !greedMode;
+          }}
+        >
+          <img
+            class="swap-on w-8 h-8 pixelated"
+            src="/images/modes/Greed.png"
+            alt="on"
+          />
+          <img
+            class="swap-off w-8 h-8 pixelated"
+            src="/images/modes/Hard.png"
             alt="off"
           />
         </label>
